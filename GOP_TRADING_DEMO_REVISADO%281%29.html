@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10131b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>GOP TRADING</title>
+<style>
+:root{--bg:#0b0e14;--panel:#151a24;--panel2:#1c2330;--gold:#e7bd58;--text:#f4f5f7;--muted:#9ba6b8;--green:#3dd598;--red:#ff6b75;--line:#2a3241}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:22px 18px 14px;background:linear-gradient(135deg,#171c27,#0b0e14);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;border-radius:13px;background:var(--gold);color:#151515;display:grid;place-items:center;font-weight:900;font-size:17px}
+h1{font-size:20px;letter-spacing:.6px;margin:0} .subtitle{font-size:12px;color:var(--muted);margin-top:3px}
+main{padding:16px;max-width:760px;margin:auto}.warning{background:#302817;border:1px solid #6b5425;color:#f7d98b;border-radius:12px;padding:11px 12px;font-size:12px;line-height:1.45;margin-bottom:16px}
+.section-title{font-size:14px;font-weight:750;margin:18px 0 10px;display:flex;justify-content:space-between;align-items:center}
+.pill{font-size:10px;padding:5px 8px;border-radius:999px;background:#303746;color:#c8d0dd}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;min-width:0}
+.asset{font-size:12px;color:var(--muted)}.price{font-size:21px;font-weight:750;margin:8px 0 5px;letter-spacing:-.5px}.change{font-size:12px;color:var(--muted)}
+.signal{display:inline-block;margin-top:10px;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:750;background:#303746;color:#d9e0eb}
+.signal.up{background:#12352d;color:var(--green)}.signal.down{background:#3a2028;color:var(--red)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px;margin-top:10px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.label{color:var(--muted);font-size:12px}.value{font-weight:700}
+button{border:0;border-radius:11px;background:var(--gold);color:#171717;font-weight:800;padding:12px 14px;width:100%;font-size:14px;margin-top:12px}
+small,footer{color:var(--muted);font-size:11px;line-height:1.5}
+footer{padding:22px 16px 32px;text-align:center}
+canvas{width:100%;height:115px;display:block;margin-top:10px}
+@media(min-width:560px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">GOP</div><div><h1>GOP TRADING</h1><div class="subtitle">Centro privado de análisis financiero</div></div></div></header>
+<main>
+<div class="warning"><strong>PROTOTIPO — DATOS FICTICIOS</strong><br>Esta versión no recibe cotizaciones en tiempo real. Las cifras y señales son demostrativas; no las uses para tomar decisiones financieras.</div>
+<div class="section-title">Mercados vigilados <span class="pill">MODO DEMO</span></div>
+<div class="grid" id="markets"></div>
+<div class="section-title">Resumen de análisis</div>
+<div class="panel">
+ <div class="row"><span class="label">Activo seleccionado</span><strong id="selectedName">Oro (XAU/USD)</strong></div>
+ <div class="row" style="margin-top:12px"><span class="label">Señal demostrativa</span><span class="signal" id="signal">ESPERAR</span></div>
+ <div class="row" style="margin-top:12px"><span class="label">Confianza del indicador de ejemplo</span><strong id="confidence">—</strong></div>
+ <canvas id="chart" width="650" height="150" aria-label="Gráfico demostrativo"></canvas>
+ <small>Gráfico ilustrativo, no representa el precio real ni una predicción.</small>
+ <button id="refresh">Actualizar demostración</button>
+</div>
+<div class="section-title">Cómo leer las señales</div>
+<div class="panel">
+ <div class="row"><span class="signal up">POSIBLE SUBIDA</span><span class="label">Ejemplo de tendencia positiva</span></div>
+ <div class="row" style="margin-top:12px"><span class="signal down">POSIBLE BAJADA</span><span class="label">Ejemplo de tendencia negativa</span></div>
+ <div class="row" style="margin-top:12px"><span class="signal">ESPERAR</span><span class="label">Sin señal demostrativa clara</span></div>
+</div>
+
+
+<div class="section-title">Ingresos y reparto comercial <span class="pill">MODO PRUEBA</span></div>
+<div class="panel" id="revenuePanel">
+ <p class="label" style="margin-top:0">Control demostrativo de ingresos comerciales de GOP TRADING. No procesa pagos, no mueve dinero y no está conectado a cuentas bancarias.</p>
+ <div class="grid">
+  <div class="card"><div class="label">Ingresos registrados</div><div class="price" id="revTotal">RD$ 0.00</div></div>
+  <div class="card"><div class="label">Gastos registrados</div><div class="price" id="expenseTotal">RD$ 0.00</div></div>
+  <div class="card"><div class="label">Resultado neto demo</div><div class="price" id="netTotal">RD$ 0.00</div></div>
+  <div class="card"><div class="label">50% fondo tecnología</div><div class="price" id="techShare">RD$ 0.00</div></div>
+ </div>
+ <div class="row" style="margin-top:14px"><span class="label">50% propietario</span><strong id="ownerShare">RD$ 0.00</strong></div>
+ <div class="row" style="margin-top:8px"><span class="label">Base del reparto</span><strong>Resultado neto positivo</strong></div>
+ <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+ <label for="entryType" class="label">Tipo de movimiento</label>
+ <select id="entryType" style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit">
+  <option value="income">Ingreso comercial</option><option value="expense">Gasto del negocio</option>
+ </select>
+ <label for="entryDescription" class="label" style="display:block;margin-top:10px">Descripción</label>
+ <input id="entryDescription" maxlength="100" placeholder="Ej.: suscripción demo, alojamiento..." style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit">
+ <label for="entryAmount" class="label" style="display:block;margin-top:10px">Importe en RD$</label>
+ <input id="entryAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit">
+ <button id="addEntry" type="button">Registrar movimiento de prueba</button>
+ <div id="entryStatus" class="label" role="status" style="margin-top:8px">Los registros se guardan únicamente en este dispositivo/navegador.</div>
+ <div class="section-title" style="margin-top:18px">Movimientos registrados</div>
+ <div id="entryList" style="display:flex;flex-direction:column;gap:8px"></div>
+ <button id="clearEntries" type="button" style="background:#343b49;color:var(--text)">Borrar registros de prueba</button>
+ <small>Regla ilustrativa: el resultado neto es ingresos menos gastos registrados; si es positivo, se muestra un 50% para propietario y un 50% para fondo de IA y tecnología. No equivale a un acuerdo societario, asesoría fiscal ni un pago real. Confirma por contrato quién tiene derecho a cada parte y cómo tratar impuestos, devoluciones y otras obligaciones.</small>
+</div>
+
+<div class="section-title">Socio IA · GPT <span class="pill">ASISTENTE</span></div>
+<div class="panel" id="gptPanel">
+ <p class="label" style="margin-top:0">Consulta sobre mercados, conceptos de trading y gestión del riesgo. La IA no garantiza resultados ni ejecuta operaciones.</p>
+ <label for="gptEndpoint" class="label">Dirección segura del servidor de IA</label>
+ <input id="gptEndpoint" type="url" placeholder="https://tu-servidor.example/api/chat" autocomplete="url"
+ style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--text)">
+ <small>No pegues una clave API aquí. La clave debe guardarse únicamente en el servidor.</small>
+ <div id="gptLog" role="log" aria-live="polite" style="margin-top:12px;max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:8px">
+  <div style="padding:10px;border-radius:10px;background:var(--panel2)">Hola, soy el asistente IA de GOP TRADING. Para activar respuestas GPT reales, conecta aquí el servidor seguro siguiendo la guía incluida en el paquete.</div>
+ </div>
+ <label for="gptQuestion" class="label" style="display:block;margin-top:12px">Tu pregunta</label>
+ <textarea id="gptQuestion" rows="3" placeholder="Ej.: Explícame qué puede mover el precio del oro..." style="display:block;width:100%;margin-top:6px;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--text);resize:vertical;font:inherit"></textarea>
+ <button id="gptSend" type="button">Preguntar al socio IA</button>
+ <small id="gptStatus" role="status">Estado: interfaz preparada; falta conectar el servidor GPT.</small>
+</div>
+
+</main>
+<footer>GOP TRADING · Prototipo privado<br>Antes de usar datos reales se requiere integrar una fuente de mercado fiable, probar cálculos y añadir controles de riesgo.</footer>
+<script>
+const assets=[
+ {id:"gold",name:"Oro",ticker:"XAU/USD",price:"2,350.00",change:"+0.42%",trend:1},
+ {id:"usd",name:"Índice dólar",ticker:"DXY",price:"104.20",change:"−0.15%",trend:-1},
+ {id:"eur",name:"Euro / dólar",ticker:"EUR/USD",price:"1.0850",change:"+0.08%",trend:1},
+ {id:"oil",name:"Petróleo",ticker:"WTI",price:"78.40",change:"−0.31%",trend:-1}
+];
+let selected="gold";
+function signalFor(a){return a.trend>0?"POSIBLE SUBIDA":a.trend<0?"POSIBLE BAJADA":"ESPERAR"}
+function render(){
+ document.getElementById("markets").innerHTML=assets.map(a=>`<div class="card" role="button" tabindex="0" data-id="${a.id}" style="outline:${selected===a.id?'1px solid var(--gold)':'none'}"><div class="asset">${a.name} · ${a.ticker}</div><div class="price">${a.price}</div><div class="change">${a.change} · demo</div><span class="signal ${a.trend>0?'up':a.trend<0?'down':''}">${signalFor(a)}</span></div>`).join("");
+ document.querySelectorAll("[data-id]").forEach(el=>{el.onclick=()=>{selected=el.dataset.id;render();draw()};el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selected=el.dataset.id;render();draw()}}});
+ const a=assets.find(x=>x.id===selected);document.getElementById("selectedName").textContent=a.name+" ("+a.ticker+")";
+ const sig=document.getElementById("signal");sig.textContent=signalFor(a);sig.className="signal "+(a.trend>0?"up":a.trend<0?"down":"");document.getElementById("confidence").textContent=(58+Math.floor(Math.random()*25))+"% (ficticio)";
+}
+function draw(){
+ const c=document.getElementById("chart");if(!c||typeof c.getContext!=="function")return;const ctx=c.getContext("2d");if(!ctx)return;const w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+ ctx.strokeStyle="#2a3241";ctx.lineWidth=1;for(let y=25;y<h;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+ let y=75;ctx.beginPath();ctx.moveTo(0,y);for(let x=0;x<w;x+=10){y+=(Math.random()-.48)*(assets.find(a=>a.id===selected).trend>0?-3:3);y=Math.max(15,Math.min(h-15,y));ctx.lineTo(x,y)}ctx.strokeStyle=assets.find(a=>a.id===selected).trend>0?"#3dd598":"#ff6b75";ctx.lineWidth=3;ctx.stroke()
+}
+document.getElementById("refresh").onclick=()=>{assets.forEach(a=>{a.trend=Math.random()>.5?1:-1;a.change=(Math.random()>.5?"+":"−")+(Math.random()*.5).toFixed(2)+"%"});render();draw()};
+render();draw();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {}));
+}
+</script>
+
+<script>
+(function(){
+ const endpoint=document.getElementById('gptEndpoint');
+ const question=document.getElementById('gptQuestion');
+ const send=document.getElementById('gptSend');
+ const log=document.getElementById('gptLog');
+ const status=document.getElementById('gptStatus');
+ try { endpoint.value=localStorage.getItem('gop_gpt_endpoint')||''; } catch(e) {}
+ function bubble(who,text){
+   const el=document.createElement('div');
+   el.style.cssText='padding:10px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;background:'+(who==='Tú'?'#302817':'var(--panel2)');
+   const strong=document.createElement('strong'); strong.textContent=who+': '; el.appendChild(strong);
+   el.appendChild(document.createTextNode(text)); log.appendChild(el); log.scrollTop=log.scrollHeight;
+ }
+ endpoint.addEventListener('change',()=>{try{localStorage.setItem('gop_gpt_endpoint',endpoint.value.trim())}catch(e){}});
+ send.addEventListener('click',async()=>{
+   const q=question.value.trim(), url=endpoint.value.trim();
+   if(!q){status.textContent='Escribe una pregunta primero.';return;}
+   if(!url){status.textContent='Falta la dirección del servidor seguro. Sigue README_GPT_ES.md para configurarlo.';return;}
+   if(!/^https:\/\//i.test(url)){status.textContent='Por seguridad, usa una dirección HTTPS.';return;}
+   bubble('Tú',q); question.value=''; send.disabled=true; send.textContent='Consultando…'; status.textContent='Conectando con el servidor…';
+   try{
+     const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q, app:'GOP TRADING'})});
+     const data=await response.json().catch(()=>({}));
+     if(!response.ok) throw new Error(data.error||('Error HTTP '+response.status));
+     bubble('Socio IA',String(data.reply||'El servidor no devolvió una respuesta.'));
+     status.textContent='Respuesta recibida. Verifica siempre los datos y el riesgo.';
+   }catch(err){
+     status.textContent='No se pudo conectar: '+err.message+'. Comprueba el servidor y la conexión.';
+   }finally{send.disabled=false;send.textContent='Preguntar al socio IA';}
+ });
+})();
+</script>
+
+
+<script>
+(function(){
+ const key='gop_revenue_demo_entries_v2';
+ const $=id=>document.getElementById(id);
+ const money=n=>'RD$ '+Number(n).toLocaleString('es-DO',{minimumFractionDigits:2,maximumFractionDigits:2});
+ let entries=[];
+ try { const raw=localStorage.getItem(key); const parsed=raw?JSON.parse(raw):[]; if(Array.isArray(parsed)) entries=parsed.filter(x=>x&&['income','expense'].includes(x.type)&&typeof x.description==='string'&&Number.isFinite(Number(x.amount))&&Number(x.amount)>0&&typeof x.date==='string').map(x=>({type:x.type,description:x.description.slice(0,100),amount:Math.round(Number(x.amount)*100)/100,date:x.date.slice(0,40)})); } catch(e){ entries=[]; }
+ function save(){ try{localStorage.setItem(key,JSON.stringify(entries));return true;}catch(e){$('entryStatus').textContent='No se pudo guardar localmente. Comprueba el almacenamiento del navegador.';return false;} }
+ function render(){
+  const income=entries.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0);
+  const expense=entries.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+  const net=income-expense, distributable=Math.max(0,net);
+  $('revTotal').textContent=money(income); $('expenseTotal').textContent=money(expense);
+  $('netTotal').textContent=money(net); $('netTotal').style.color=net<0?'var(--red)':'var(--text)';
+  $('ownerShare').textContent=money(distributable*.5); $('techShare').textContent=money(distributable*.5);
+  const list=$('entryList'); list.replaceChildren();
+  if(!entries.length){const empty=document.createElement('div');empty.className='label';empty.textContent='Todavía no hay movimientos. Puedes añadir ejemplos de prueba.';list.appendChild(empty);return;}
+  entries.slice().reverse().forEach((item)=>{
+   const row=document.createElement('div');row.className='row';row.style.cssText='background:var(--panel2);border-radius:10px;padding:10px';
+   const left=document.createElement('div');left.style.minWidth='0';
+   const desc=document.createElement('div');desc.textContent=item.description;desc.style.cssText='font-weight:700;overflow-wrap:anywhere';
+   const kind=document.createElement('div');kind.className='label';kind.textContent=(item.type==='income'?'Ingreso':'Gasto')+' · '+item.date;
+   left.append(desc,kind); const amount=document.createElement('strong');amount.textContent=(item.type==='income'?'+':'−')+money(item.amount);amount.style.color=item.type==='income'?'var(--green)':'var(--red)';
+   row.append(left,amount);list.appendChild(row);
+  });
+ }
+ $('addEntry').addEventListener('click',()=>{
+  const description=$('entryDescription').value.trim(), amount=Number($('entryAmount').value), type=$('entryType').value;
+  if(!description){$('entryStatus').textContent='Escribe una descripción.';return;}
+  if(!Number.isFinite(amount)||amount<=0){$('entryStatus').textContent='Introduce un importe mayor que cero.';return;}
+  if(entries.length>=500){$('entryStatus').textContent='Límite de 500 movimientos de prueba alcanzado. Exporta o borra registros antes de continuar.';return;}
+  entries.push({type,description,amount:Math.round(amount*100)/100,date:new Date().toLocaleDateString('es-DO')});
+  const saved=save();render();if(saved){$('entryDescription').value='';$('entryAmount').value='';$('entryStatus').textContent='Movimiento de prueba guardado localmente; no se realizó ningún pago.';}
+ });
+ $('clearEntries').addEventListener('click',()=>{
+  if(!confirm('¿Borrar todos los movimientos de prueba de este navegador?'))return;
+  const previous=entries;entries=[];const saved=save();if(!saved){entries=previous;return;}render();$('entryStatus').textContent='Registros de prueba borrados. No se afectó ningún dinero real.';
+ });
+ render();
+})();
+</script>
+
+</body>
+</html>
